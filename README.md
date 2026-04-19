@@ -68,6 +68,24 @@ Runtime prompts are loaded from [prompt_instructions.md](prompt_instructions.md)
 
 If these sections are missing, [rag.py](rag.py) falls back to built-in default prompts.
 
+## System Flow
+
+```mermaid
+flowchart TD
+	A[PDFs in knowledge_base_pdfs] --> B[Load and split documents]
+	B --> C[Create embeddings]
+	C --> D[Store vectors in Chroma]
+
+	E[User query] --> F[Embed and search Chroma]
+	D --> F
+	F --> G{Relevant chunks found?}
+	G -->|Yes| H[Build retrieval prompt with context]
+	G -->|No| I[Build direct fallback prompt]
+	H --> J[FLAN-T5 generates answer]
+	I --> J
+	J --> K[Return response]
+```
+
 ## Troubleshooting
 
 - No PDFs found or file/path errors:
@@ -100,3 +118,7 @@ If these sections are missing, [rag.py](rag.py) falls back to built-in default p
 - This is retrieval-first RAG, not a full autonomous agent loop.
 - Chroma is persistent (`persist_directory="chroma_db"`), so embeddings are reused across runs.
 - If no retrieved chunks pass `MAX_DISTANCE`, the script uses direct-answer fallback.
+
+## Learning Sources
+- [Building an Agentic RAG Pipeline](https://amanxai.com/2025/12/30/building-an-agentic-rag-pipeline/)
+- [Building Retrieval-Augmented Generation on VS Code + AI Toolkit](https://techcommunity.microsoft.com/blog/azuredevcommunityblog/building-retrieval-augmented-generation-on-vscode--ai-toolkit/4241035)
